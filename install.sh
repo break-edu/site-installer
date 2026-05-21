@@ -235,8 +235,8 @@ main() {
   install_tailscale
 
   github_login
-  setup_cloudflare_tunnel
-  tailscale_up
+#   setup_cloudflare_tunnel
+#   tailscale_up
 
   branch="$(choose_branch)"
   clone_repo "$branch"
