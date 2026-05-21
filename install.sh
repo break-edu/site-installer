@@ -17,6 +17,37 @@ confirm() {
   [[ "${ans,,}" == "y" || "${ans,,}" == "yes" ]]
 }
 
+install_tailscale() {
+  if command -v tailscale >/dev/null 2>&1; then
+    info "Tailscale이 이미 설치되어 있습니다: $(tailscale version | head -n1)"
+  else
+    info "Tailscale을 설치합니다"
+
+    # Tailscale 공식 Linux 설치 스크립트.
+    # Ubuntu에서는 공식 APT 저장소 등록 후 tailscale 패키지를 설치합니다.
+    curl -fsSL https://tailscale.com/install.sh | sh
+  fi
+
+  info "tailscaled 서비스를 활성화합니다"
+  sudo systemctl enable --now tailscaled
+}
+
+tailscale_up() {
+  info "Tailscale 로그인 상태를 확인합니다"
+
+  if tailscale status >/dev/null 2>&1; then
+    info "이미 Tailscale에 연결되어 있습니다"
+    tailscale status
+    return
+  fi
+
+  warn "브라우저 로그인 URL이 출력됩니다. 해당 URL로 접속해 이 서버를 Tailnet에 등록하세요."
+  sudo tailscale up
+
+  info "Tailscale 연결 상태"
+  tailscale status
+}
+
 install_base_packages() {
   info "기본 패키지를 설치합니다"
   sudo apt-get update
@@ -201,8 +232,11 @@ main() {
   install_docker
   install_gh
   install_cloudflared
+  install_tailscale
+
   github_login
   setup_cloudflare_tunnel
+  tailscale_up
 
   branch="$(choose_branch)"
   clone_repo "$branch"
