@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
 
 REPO="break-edu/breakedu-site-proto3"
 WORKDIR="${WORKDIR:-$HOME/breakedu-site-proto3}"
